@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
+import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
+
+export const runtime = "nodejs"; 
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +19,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const adminAuth = getAdminAuth();
+    const adminDb = getAdminDb();
 
     const email = `${username}@evote.local`;
 
