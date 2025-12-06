@@ -1,4 +1,3 @@
-// lib/firebaseAdmin.ts
 import { cert, getApps, initializeApp, App as FirebaseAdminApp } from "firebase-admin/app";
 import { getAuth, Auth } from "firebase-admin/auth";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
@@ -15,9 +14,14 @@ function initAdminApp() {
   const rawPrivateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
   if (!projectId || !clientEmail || !rawPrivateKey) {
-    // Di Vercel kalau ini terjadi, error-nya akan jelas
+    // kalau env kurang, kita mau tau pasti dari log:
+    console.error("Missing Firebase Admin env vars", {
+      hasProjectId: !!projectId,
+      hasClientEmail: !!clientEmail,
+      hasPrivateKey: !!rawPrivateKey,
+    });
     throw new Error(
-      "Missing Firebase Admin env vars. Pastikan FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, dan FIREBASE_ADMIN_PRIVATE_KEY sudah di-set di Vercel."
+      "Missing Firebase Admin env vars. Pastikan FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, dan FIREBASE_ADMIN_PRIVATE_KEY sudah di-set di Vercel (Production & Preview)."
     );
   }
 
