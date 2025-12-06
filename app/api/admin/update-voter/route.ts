@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +19,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const adminDb = getAdminDb();
 
     await adminDb.collection("users").doc(uid).update({
       name,
