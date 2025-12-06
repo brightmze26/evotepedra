@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
+import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,33 +10,32 @@ export async function POST(req: NextRequest) {
 
     if (!uid) {
       return NextResponse.json(
-        { error: "uid wajib diisi" },
+        { error: "uid pemilih tidak diberikan" },
         { status: 400 }
       );
     }
 
-    // 1) Hapus semua vote milik pemilih ini
+    const adminAuth = getAdminAuth();
+    const adminDb = getAdminDb();
+
+    // 1. Hapus user di Firebase Auth
+    await adminAuth.deleteUser(uid);
+
+    // 2. Hapus dokumen user di Firestore
+    await adminDb.collection("users").doc(uid).delete();
+
+    // 3. Hapus semua votes milik user ini
     const votesSnap = await adminDb
       .collection("votes")
       .where("voterId", "==", uid)
       .get();
 
-    if (!votesSnap.empty) {
-      const batch = adminDb.batch();
-      votesSnap.forEach((docSnap) => {
-        batch.delete(docSnap.ref);
-      });
-      await batch.commit();
-    }
-
-    // 2) Hapus dokumen user di Firestore
-    await adminDb.collection("users").doc(uid).delete();
-
-    // 3) Hapus user di Firebase Auth
-    await adminAuth.deleteUser(uid);
+    const batch = adminDb.batch();
+    votesSnap.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
 
     return NextResponse.json({ ok: true });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error delete-voter:", err);
     return NextResponse.json(
       { error: "Gagal menghapus pemilih" },
