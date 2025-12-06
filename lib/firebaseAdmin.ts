@@ -1,22 +1,55 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+// lib/firebaseAdmin.ts
+import { cert, getApps, initializeApp, App as FirebaseAdminApp } from "firebase-admin/app";
+import { getAuth, Auth } from "firebase-admin/auth";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
 
-const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n");
+let adminApp: FirebaseAdminApp | null = null;
+let adminAuthInstance: Auth | null = null;
+let adminDbInstance: Firestore | null = null;
 
-if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || !privateKey) {
-  console.warn("Firebase Admin env vars are not fully set. Admin features may not work.");
+function initAdminApp() {
+  if (adminApp) return adminApp;
+
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+  const rawPrivateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+
+  if (!projectId || !clientEmail || !rawPrivateKey) {
+    // Di Vercel kalau ini terjadi, error-nya akan jelas
+    throw new Error(
+      "Missing Firebase Admin env vars. Pastikan FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, dan FIREBASE_ADMIN_PRIVATE_KEY sudah di-set di Vercel."
+    );
+  }
+
+  const privateKey = rawPrivateKey.replace(/\\n/g, "\n");
+
+  if (getApps().length === 0) {
+    adminApp = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+  } else {
+    adminApp = getApps()[0]!;
+  }
+
+  return adminApp!;
 }
 
-const adminApp =
-  getApps()[0] ||
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: privateKey,
-    }),
-  });
+export function getAdminAuth(): Auth {
+  if (!adminAuthInstance) {
+    const app = initAdminApp();
+    adminAuthInstance = getAuth(app);
+  }
+  return adminAuthInstance;
+}
 
-export const adminAuth = getAuth(adminApp);
-export const adminDb = getFirestore(adminApp);
+export function getAdminDb(): Firestore {
+  if (!adminDbInstance) {
+    const app = initAdminApp();
+    adminDbInstance = getFirestore(app);
+  }
+  return adminDbInstance;
+}
