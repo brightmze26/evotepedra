@@ -152,7 +152,7 @@ export default function LoginPage() {
           <p className="mt-4 text-[15px] text-gray-500 text-center italic">
             Sistem mencatat bahwa waktu pemilihan telah berakhir. Terima kasih atas partisipasi anda dalam pemilihan Calon Ketua Himpunan Mahasiswa Geofisika "PEDRA".
           </p>
-          <p className="mt-4 text-[15px] text-gray-500 text-center italic">
+          <p className="mt-4 text-[13px] text-gray-500 text-center">
             © 2025 KPU PEDRA. All Rights Reserved
           </p>
         </motion.form>
