@@ -99,7 +99,7 @@ export default function LoginPage() {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl px-7 py-7 md:px-8 md:py-8 w-full max-w-md mx-auto border border-red-900/20"
         >
-          <motion.h2
+          {/* <motion.h2
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -147,11 +147,13 @@ export default function LoginPage() {
             className="w-full py-2.5 text-sm font-semibold bg-red-900 text-white rounded-lg hover:bg-red-800 transition disabled:bg-gray-400"
           >
             {loadingLogin ? "Memproses..." : "Login"}
-          </motion.button>
+          </motion.button> */}
 
-          <p className="mt-4 text-[11px] text-gray-500 text-center italic">
-            Jika Anda mengalami kendala login, silakan menghubungi panitia
-            pemilihan atau admin sistem.
+          <p className="mt-4 text-[15px] text-gray-500 text-center italic">
+            Sistem mencatat bahwa waktu pemilihan telah berakhir. Terima kasih atas partisipasi anda dalam pemilihan Calon Ketua Himpunan Mahasiswa Geofisika "PEDRA".
+          </p>
+          <p className="mt-4 text-[15px] text-gray-500 text-center italic">
+            © 2025 KPU PEDRA. All Rights Reserved
           </p>
         </motion.form>
       </div>
